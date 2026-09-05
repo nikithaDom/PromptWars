@@ -50,7 +50,7 @@ router.post('/:id/summary', async (req, res) => {
   try {
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+      model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
       systemInstruction: SUMMARY_SYSTEM,
     });
 

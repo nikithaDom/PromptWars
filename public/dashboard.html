@@ -10,47 +10,46 @@
 <body>
 
   <nav>
-    <a class="nav-brand" href="/dashboard.html">⚕ MedLens</a>
+    <a class="nav-brand" href="/dashboard.html">MedLens</a>
     <a href="/dashboard.html" class="active-nav">Patients</a>
-    <a href="/index.html">+ New Intake</a>
+    <a href="/index.html">New Patient Intake</a>
   </nav>
 
-  <main style="max-width: 1060px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+  <main style="max-width: 1040px;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--hairline); flex-wrap: wrap; gap: 16px;">
       <div>
-        <h1>Patient Directory</h1>
+        <h1 style="margin: 0; font-size: 2rem;">Patient Directory</h1>
         <p class="page-sub">Longitudinal records, multi-report histories, and clinical audit logs.</p>
       </div>
-      <a href="/index.html" class="btn" style="white-space: nowrap;">+ New Patient Intake</a>
+      <a href="/index.html" class="btn" style="white-space: nowrap;">New Patient Intake</a>
     </div>
 
     <!-- Quick Stats Bar -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-num" id="stat-patients">0</div>
-        <div class="stat-label">Total Patients</div>
+        <div class="stat-label">Total patients</div>
       </div>
       <div class="stat-card">
         <div class="stat-num" id="stat-reports">0</div>
-        <div class="stat-label">Uploaded Reports</div>
+        <div class="stat-label">Uploaded lab reports</div>
       </div>
       <div class="stat-card">
         <div class="stat-num" id="stat-tests">0</div>
-        <div class="stat-label">Unique Tests Tracked</div>
+        <div class="stat-label">Unique tests tracked</div>
       </div>
     </div>
 
     <!-- Search & Filter Area -->
-    <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
+    <div class="filter-bar-card" style="margin-bottom: 20px;">
       <div style="display: flex; gap: 12px; align-items: center;">
-        <span style="font-size: 1.1rem; color: var(--text-muted);">🔍</span>
         <input
           type="text"
           id="search-input"
-          placeholder="Search patients by name, MRN, or patient ID…"
-          style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 9px 14px; font-size: 0.95rem;"
+          placeholder="Search patients by name, MRN, or identifier…"
+          style="flex: 1; border: 1px solid var(--hairline-dark); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 0.9rem;"
         >
-        <span id="search-count" class="text-muted" style="font-size: 0.85rem; white-space: nowrap;"></span>
+        <span id="search-count" class="text-muted" style="font-size: 0.82rem; white-space: nowrap;"></span>
       </div>
     </div>
 
@@ -58,7 +57,7 @@
     <div id="alert-area"></div>
 
     <!-- Patient Directory Table -->
-    <div class="card" style="padding: 0; overflow: hidden;">
+    <div class="doc-panel" style="padding: 0; overflow: hidden; border: none; background: transparent;">
       <div class="table-wrap">
         <table id="patients-table">
           <thead>

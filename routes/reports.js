@@ -76,7 +76,7 @@ router.post('/:id/reports', upload.single('report'), async (req, res) => {
 
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+      model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
       systemInstruction: EXTRACTION_SYSTEM,
       generationConfig: {
         responseMimeType: 'application/json',

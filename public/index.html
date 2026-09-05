@@ -10,28 +10,28 @@
 <body>
 
   <nav>
-    <a class="nav-brand" href="/dashboard.html">⚕ MedLens</a>
+    <a class="nav-brand" href="/dashboard.html">MedLens</a>
     <a href="/dashboard.html">Patients</a>
-    <a href="/index.html" class="active-nav">+ New Intake</a>
+    <a href="/index.html" class="active-nav">New Patient Intake</a>
   </nav>
 
   <main>
     <h1>Patient Intake Form</h1>
     <p class="page-sub">
-      Fill in the patient's details below. Every field you enter will be labelled
-      <span class="badge badge-user">You entered this</span> throughout the app.
+      Document baseline patient clinical details. Every field you enter will be labelled
+      <span class="provenance-badge prov-user">Clinician entered</span> throughout the record.
     </p>
 
     <!-- Error / success messages appear here -->
     <div id="alert-area"></div>
 
-    <div class="card">
+    <div class="doc-panel">
       <form id="intake-form" novalidate>
 
         <!-- Patient Name & MRN -->
         <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px;">
           <div class="form-group">
-            <label for="name">Patient Full Name <span class="required">*</span></label>
+            <label for="name">Patient full name <span class="required">*</span></label>
             <input type="text" id="name" name="name" placeholder="e.g. Eleanor Vance" required>
           </div>
           <div class="form-group">
@@ -47,7 +47,7 @@
             <input type="number" id="age" name="age" min="0" max="150" placeholder="e.g. 45" required>
           </div>
           <div class="form-group">
-            <label for="sex">Biological Sex <span class="required">*</span></label>
+            <label for="sex">Biological sex <span class="required">*</span></label>
             <select id="sex" name="sex" required>
               <option value="">Select…</option>
               <option value="Male">Male</option>
@@ -58,13 +58,13 @@
         </div>
 
         <div class="form-group">
-          <label for="symptoms">Current Symptoms</label>
+          <label for="symptoms">Current symptoms</label>
           <textarea id="symptoms" name="symptoms"
             placeholder="e.g. fatigue, headaches for 2 weeks, occasional dizziness"></textarea>
         </div>
 
         <div class="form-group">
-          <label for="existing_conditions">Existing Conditions</label>
+          <label for="existing_conditions">Existing conditions</label>
           <textarea id="existing_conditions" name="existing_conditions"
             placeholder="e.g. Type 2 diabetes, hypertension, asthma"></textarea>
         </div>
@@ -76,19 +76,19 @@
         </div>
 
         <div class="form-group">
-          <label for="current_medications">Current Medications</label>
+          <label for="current_medications">Current medications</label>
           <textarea id="current_medications" name="current_medications"
             placeholder="e.g. Metformin 500 mg twice daily, Lisinopril 10 mg once daily"></textarea>
         </div>
 
         <div class="form-group">
-          <label for="notes">Additional Notes</label>
+          <label for="notes">Additional clinical notes</label>
           <textarea id="notes" name="notes"
-            placeholder="Anything else the doctor or patient wants to record"></textarea>
+            placeholder="Additional observations or history"></textarea>
         </div>
 
         <button type="submit" class="btn" id="submit-btn">
-          Save &amp; Continue to Report Upload →
+          Save and Continue
         </button>
 
       </form>

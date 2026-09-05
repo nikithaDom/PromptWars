@@ -31,17 +31,16 @@ async function renderConflicts(patientId, containerId = 'conflicts-banner-area')
       return `
         <div class="conflict-card ${isAcknowledged ? 'conflict-acknowledged' : 'conflict-pending'}">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1.1rem;">⚠️</span>
-              <strong style="color: #92400e; font-size: 0.95rem;">${escapeHtml(c.title)}</strong>
-              <span class="badge badge-ai" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <strong style="color: var(--flag-low-ink); font-size: 0.95rem;">${escapeHtml(c.title)}</strong>
+              <span class="provenance-badge prov-ai">
                 AI suggested
               </span>
             </div>
             <div>
               ${isAcknowledged
-                ? `<span class="badge-verified" style="font-size: 0.78rem;">✓ Acknowledged by ${escapeHtml(c.acknowledged_by || 'Clinician')}</span>`
-                : `<button type="button" class="btn btn-xs" style="background:#d97706; color:#fff;" onclick="window.acknowledgeConflict('${patientId}', '${c.id}')">Acknowledge</button>`
+                ? `<span class="badge-verified" style="font-size: 0.78rem;">Verified by ${escapeHtml(c.acknowledged_by || 'Clinician')}</span>`
+                : `<button type="button" class="btn btn-sm btn-outline" style="font-size: 0.75rem;" onclick="window.acknowledgeConflict('${patientId}', '${c.id}')">Acknowledge Review</button>`
               }
             </div>
           </div>
@@ -53,10 +52,10 @@ async function renderConflicts(patientId, containerId = 'conflicts-banner-area')
     }).join('');
 
     container.innerHTML = `
-      <div class="card" style="border-left: 4px solid #f59e0b; background: #fffbeb; margin-bottom: 20px; padding: 16px 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="margin: 0; color: #b45309; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
-            <span>⚠️</span> Possible Inconsistencies — Needs Human Review
+      <div class="doc-panel" style="border-left: 3px solid var(--flag-low-bar); background: #FFFDF9; margin-bottom: 24px; padding: 18px 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h3 style="margin: 0; color: var(--flag-low-ink); font-size: 1.15rem; display: flex; align-items: baseline; gap: 8px;">
+            Possible Inconsistencies — Clinical Review Required
             ${pendingCount > 0 ? `<span class="count-pill">${pendingCount} pending</span>` : ''}
           </h3>
           <button type="button" class="btn btn-sm btn-outline" style="font-size: 0.75rem;" onclick="window.scanForConflicts('${patientId}')">

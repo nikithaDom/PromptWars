@@ -57,23 +57,23 @@ async function loadPatients(query = '') {
       });
 
       const reportBadge = p.report_count > 0
-        ? `<span class="flag flag-normal" style="font-size:0.75rem;">${p.report_count} report${p.report_count === 1 ? '' : 's'}</span>`
-        : `<span class="text-muted" style="font-size:0.8rem;">None yet</span>`;
+        ? `<span class="provenance-badge prov-ai" style="font-size:0.75rem;">${p.report_count} report${p.report_count === 1 ? '' : 's'}</span>`
+        : `<span class="text-muted" style="font-size:0.8rem;">None</span>`;
 
       return `
         <tr>
           <td>
-            <div style="font-weight: 600; color: var(--text);">
-              <a href="/record.html?id=${p.id}" style="text-decoration: none; color: inherit;" class="patient-title-link">
+            <div>
+              <a href="/record.html?id=${p.id}" class="patient-title-link" style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--ink-primary);">
                 ${escapeHtml(p.name)}
               </a>
             </div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">
+            <div style="font-size: 0.78rem; color: var(--ink-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 2px;">
               ${escapeHtml(p.mrn)}
             </div>
           </td>
           <td>
-            <div style="font-size: 0.9rem;">
+            <div style="font-size: 0.88rem; color: var(--ink-secondary);">
               ${p.age !== '—' ? `${p.age} yrs` : 'Age —'} • ${p.sex}
             </div>
           </td>
@@ -81,13 +81,13 @@ async function loadPatients(query = '') {
             ${reportBadge}
           </td>
           <td>
-            <span style="font-size: 0.85rem; font-weight: 500;">
+            <span style="font-size: 0.88rem; font-weight: 500; font-variant-numeric: tabular-nums;">
               ${p.test_count || 0} tests
             </span>
           </td>
           <td>
-            <div style="font-size: 0.82rem;">${formattedDate}</div>
-            <div style="font-size: 0.74rem; color: var(--text-muted);">${formattedTime}</div>
+            <div style="font-size: 0.84rem; color: var(--ink-primary);">${formattedDate}</div>
+            <div style="font-size: 0.76rem; color: var(--ink-muted);">${formattedTime}</div>
           </td>
           <td style="text-align: right;">
             <div style="display: inline-flex; gap: 8px;">
@@ -95,7 +95,7 @@ async function loadPatients(query = '') {
                 Open Record
               </a>
               <a href="/upload.html?id=${p.id}" class="btn btn-sm btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" title="Upload new report for this patient">
-                + Report
+                Upload Report
               </a>
             </div>
           </td>

@@ -8,63 +8,63 @@
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     .login-wrapper {
-      min-height: calc(100vh - 56px);
+      min-height: calc(100vh - 54px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 32px 24px;
     }
     .login-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      background: var(--surface-doc);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+      box-shadow: none;
       max-width: 440px;
       width: 100%;
-      padding: 36px;
+      padding: 36px 32px;
     }
     .demo-box {
-      background: #eff6ff;
-      border: 1px dashed #93c5fd;
-      border-radius: 8px;
+      background: var(--teal-faint);
+      border: 1px solid var(--teal-border);
+      border-radius: var(--radius-sm);
       padding: 14px 16px;
       margin-bottom: 20px;
-      font-size: 0.85rem;
-      color: #1e40af;
+      font-size: 0.84rem;
+      color: var(--teal-hover);
     }
     .demo-box code {
-      background: #dbeafe;
+      background: #FFFFFF;
       padding: 2px 6px;
-      border-radius: 4px;
+      border: 1px solid var(--teal-border);
+      border-radius: var(--radius-sm);
       font-weight: 600;
-      color: #1e3a8a;
+      color: var(--ink-primary);
     }
   </style>
 </head>
 <body>
 
   <nav>
-    <a class="nav-brand" href="/">⚕ MedLens</a>
-    <span style="font-size:0.875rem; color:var(--text-muted);">Clinical Portal</span>
+    <a class="nav-brand" href="/">MedLens</a>
+    <span style="font-size:0.875rem; color:var(--ink-muted);">Clinical Portal</span>
   </nav>
 
   <div class="login-wrapper">
     <div class="login-card">
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="font-size: 2.2rem; margin-bottom: 6px;">🩺</div>
-        <h1 style="font-size: 1.5rem; margin-bottom: 4px;">Clinician Login</h1>
-        <p class="text-muted" style="font-size: 0.9rem;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 6px;">Clinician Login</h1>
+        <p class="page-sub" style="font-size: 0.9rem;">
           Sign in to access patient records and lab analyses
         </p>
       </div>
 
       <div class="demo-box">
-        <strong>Demo Access Enabled:</strong><br>
+        <strong>Demo Access Credentials:</strong><br>
         Email: <code>clinician@medlens.local</code><br>
         Password: <code>demo123</code>
-        <div style="margin-top: 8px;">
-          <button type="button" id="btn-fill-demo" class="btn btn-sm" style="background:#2563eb; color:#fff; padding:4px 10px; font-size:0.75rem;">
-            Auto-Fill Demo Credentials
+        <div style="margin-top: 10px;">
+          <button type="button" id="btn-fill-demo" class="btn btn-sm btn-outline" style="font-size:0.78rem;">
+            Auto-fill demo credentials
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@
 
       <form id="login-form">
         <div class="form-group">
-          <label for="email">Clinician Email</label>
+          <label for="email">Clinician email</label>
           <input type="text" id="email" name="email" required placeholder="clinician@medlens.local" value="clinician@medlens.local">
         </div>
 
@@ -83,7 +83,7 @@
         </div>
 
         <button type="submit" class="btn" id="login-btn" style="width: 100%; margin-top: 12px;">
-          Sign In to MedLens
+          Sign in to MedLens
         </button>
       </form>
     </div>

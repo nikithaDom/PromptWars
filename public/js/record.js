@@ -29,18 +29,18 @@ let filterState = {
   onlyNeedingReview: false,
 };
 
-// ---- Badge helper ----
+// ---- Badge helper (Visually distinct in B&W: Solid Dark for Clinician, Outlined Muted Teal for AI) ----
 function badge(source) {
   if (source === 'user_provided' || source === 'user_edited') {
-    return '<span class="badge badge-user">You entered this</span>';
+    return '<span class="provenance-badge prov-user">Clinician entered</span>';
   }
   if (source === 'user_clarified') {
-    return '<span class="badge badge-user" style="background:#dcfce7; color:#15803d; border-color:#86efac;">User clarified</span>';
+    return '<span class="provenance-badge prov-user">Clarified</span>';
   }
   if (source === 'ai_generated') {
-    return '<span class="badge badge-ai" style="background:#f3e8ff; color:#7e22ce;">AI generated</span>';
+    return '<span class="provenance-badge prov-ai">AI generated</span>';
   }
-  return '<span class="badge badge-ai">AI extracted this</span>';
+  return '<span class="provenance-badge prov-ai">AI extracted</span>';
 }
 
 // ---- Confidence score indicator ----
@@ -48,28 +48,88 @@ function confidenceBadge(conf) {
   if (typeof conf !== 'number' || isNaN(conf)) return '';
   const pct = Math.round(conf <= 1 ? conf * 100 : conf);
   if (pct >= 85) {
-    return `<span class="conf-pill conf-high" title="AI Extraction Confidence: ${pct}%">● ${pct}%</span>`;
+    return `<span class="conf-pill conf-high" title="AI Extraction Confidence: ${pct}%">${pct}%</span>`;
   }
   if (pct >= 70) {
-    return `<span class="conf-pill conf-med" title="AI Extraction Confidence: ${pct}%">● ${pct}%</span>`;
+    return `<span class="conf-pill conf-med" title="AI Extraction Confidence: ${pct}%">${pct}%</span>`;
   }
-  return `<span class="conf-pill conf-low" title="Low Extraction Confidence: ${pct}% (Review recommended)">● ${pct}% Review</span>`;
+  return `<span class="conf-pill conf-low" title="Low Extraction Confidence: ${pct}% (Review recommended)">${pct}% Review</span>`;
 }
 
-// ---- Flag helper (pure JavaScript, no LLM) ----
+// ---- Flag helper: Horizontal Bar Reference-Range Gauge (Pure arithmetic, no LLM) ----
 function flagChip(value, low, high) {
   if (low === null || low === undefined || high === null || high === undefined) {
-    return { html: '<span class="flag flag-none">Range not provided</span>', flag: 'none' };
+    return {
+      html: `
+        <div class="range-cell-wrapper">
+          <div class="range-header-line">
+            <span class="flag-label flag-none">No reference range</span>
+          </div>
+        </div>
+      `,
+      flag: 'none'
+    };
   }
 
   const num = parseFloat(value);
-  if (isNaN(num)) {
-    return { html: '<span class="flag flag-none">Range not provided</span>', flag: 'none' };
+  const lowNum = parseFloat(low);
+  const highNum = parseFloat(high);
+
+  if (isNaN(num) || isNaN(lowNum) || isNaN(highNum)) {
+    return {
+      html: `
+        <div class="range-cell-wrapper">
+          <div class="range-header-line">
+            <span class="flag-label flag-none">Non-numeric</span>
+          </div>
+        </div>
+      `,
+      flag: 'none'
+    };
   }
 
-  if (num < parseFloat(low))  return { html: '<span class="flag flag-low">Low</span>', flag: 'Low' };
-  if (num > parseFloat(high)) return { html: '<span class="flag flag-high">High</span>', flag: 'High' };
-  return { html: '<span class="flag flag-normal">Normal</span>', flag: 'Normal' };
+  let flag = 'Normal';
+  let flagClass = 'flag-normal';
+  let markerClass = 'range-marker-normal';
+
+  if (num < lowNum) {
+    flag = 'Low';
+    flagClass = 'flag-low';
+    markerClass = 'range-marker-low';
+  } else if (num > highNum) {
+    flag = 'High';
+    flagClass = 'flag-high';
+    markerClass = 'range-marker-high';
+  }
+
+  const rangeSpan = Math.max(0.001, highNum - lowNum);
+  const minDisplay = lowNum - (rangeSpan * 0.45);
+  const maxDisplay = highNum + (rangeSpan * 0.45);
+  const totalSpan = maxDisplay - minDisplay;
+
+  const startPct = Math.max(5, Math.min(45, ((lowNum - minDisplay) / totalSpan) * 100));
+  const widthPct = Math.max(10, Math.min(80, (rangeSpan / totalSpan) * 100));
+
+  let valPct = ((num - minDisplay) / totalSpan) * 100;
+  valPct = Math.max(3, Math.min(97, valPct));
+
+  return {
+    html: `
+      <div class="range-cell-wrapper">
+        <div class="range-header-line">
+          <span class="flag-label ${flagClass}">${flag}</span>
+          <span style="font-size: 0.72rem; color: var(--ink-muted); font-variant-numeric: tabular-nums;">
+            ${lowNum}–${highNum}
+          </span>
+        </div>
+        <div class="range-track" aria-hidden="true" title="Value: ${num} | Reference: ${lowNum} to ${highNum}">
+          <div class="range-normal-zone" style="left: ${startPct}%; width: ${widthPct}%;"></div>
+          <div class="range-marker ${markerClass}" style="left: ${valPct}%;"></div>
+        </div>
+      </div>
+    `,
+    flag: flag
+  };
 }
 
 // ---- Tab Controller ----
@@ -163,22 +223,22 @@ async function loadRecord() {
 
     // Render patient title banner with PDF Export button
     headerArea.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--hairline); flex-wrap: wrap; gap: 14px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <h1 style="margin: 0; font-size: 1.65rem;">${escapeHtml(patientName)}</h1>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <h1 style="margin: 0; font-size: 2rem;">${escapeHtml(patientName)}</h1>
             <span class="mrn-badge">${escapeHtml(patientMrn)}</span>
           </div>
-          <p class="page-sub" style="margin-top: 4px;">
+          <p class="page-sub">
             Demographics: ${f.age?.value || '—'} yrs, ${f.sex?.value || '—'} • Created ${new Date(patient.created_at).toLocaleDateString()}
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button type="button" class="btn btn-sm btn-outline" onclick="window.exportRecordAsPdf('${patientId}')" title="Download printable clinical PDF with provenance badges">
-            📄 Export Record as PDF
+            Export Record (PDF)
           </button>
-          <a href="/upload.html?id=${patientId}" class="btn btn-sm">+ Upload Lab Report</a>
-          <a href="/summary.html?id=${patientId}" class="btn btn-sm btn-purple">Generate Summary</a>
+          <a href="/upload.html?id=${patientId}" class="btn btn-sm">Upload Lab Report</a>
+          <a href="/summary.html?id=${patientId}" class="btn btn-sm btn-outline">Generate Summary</a>
         </div>
       </div>
     `;
@@ -190,25 +250,25 @@ async function loadRecord() {
       ['Age',                  'age',                  f.age?.value,                  f.age?.source],
       ['Sex',                  'sex',                  f.sex?.value,                  f.sex?.source],
       ['Symptoms',             'symptoms',             f.symptoms?.value,             f.symptoms?.source],
-      ['Existing Conditions',  'existing_conditions',  f.existing_conditions?.value,  f.existing_conditions?.source],
+      ['Existing conditions',  'existing_conditions',  f.existing_conditions?.value,  f.existing_conditions?.source],
       ['Allergies',            'allergies',            f.allergies?.value,            f.allergies?.source],
-      ['Current Medications',  'current_medications',  f.current_medications?.value,  f.current_medications?.source],
-      ['Notes',                'notes',                f.notes?.value,                f.notes?.source],
+      ['Current medications',  'current_medications',  f.current_medications?.value,  f.current_medications?.source],
+      ['Clinical notes',       'notes',                f.notes?.value,                f.notes?.source],
     ];
 
     const infoHtml = infoFields.map(([label, key, val, src]) => `
       <div class="info-row">
         <span class="info-label">${label}</span>
         <span class="info-value">
-          <span>${escapeHtml(val || '—')}</span>
-          <span style="display: inline-flex; align-items: center; gap: 6px;">
+          <span style="font-weight: 500;">${escapeHtml(val || '—')}</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
             ${badge(src || 'user_provided')}
             <button
               type="button"
               class="btn-edit-inline"
               title="Edit ${label}"
               onclick="window.editPatientField('${patientId}', 'patient_field', '${key}', '${escapeAttr(val || '')}', { label: '${label}' })"
-            >✎ Edit</button>
+            >Edit</button>
           </span>
         </span>
       </div>
@@ -276,25 +336,25 @@ async function loadRecord() {
                   ${confidenceBadge(confScore)}
                 </div>
               </td>
-              <td>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.05rem; font-weight: 600;">${escapeHtml(String(testVal))}</span>
+              <td class="col-numeric">
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                  <span class="data-value-text">${escapeHtml(String(testVal))}</span>
                   <button
                     type="button"
                     class="btn-edit-inline"
                     title="Edit test value"
                     onclick="window.editPatientField('${patientId}', 'test_result', 'value', '${escapeAttr(String(testVal))}', { reportId: '${report.id}', testId: '${r.id}', label: '${escapeAttr(testName)} value' })"
-                  >✎</button>
+                  >Edit</button>
                 </div>
-                <div>${badge(r.value?.source)}</div>
+                <div style="text-align: right; margin-top: 2px;">${badge(r.value?.source)}</div>
               </td>
               <td>
-                ${escapeHtml(r.unit?.value || '—')}
-                <div>${badge(r.unit?.source)}</div>
+                <span style="font-weight: 500;">${escapeHtml(r.unit?.value || '—')}</span>
+                <div style="margin-top: 2px;">${badge(r.unit?.source)}</div>
               </td>
               <td>
-                ${escapeHtml(rangeText)}
-                <div>${badge(r.reference_range_raw_text?.source)}</div>
+                <span style="font-variant-numeric: tabular-nums;">${escapeHtml(rangeText)}</span>
+                <div style="margin-top: 2px;">${badge(r.reference_range_raw_text?.source)}</div>
               </td>
               <td>
                 ${flagObj.html}
@@ -312,11 +372,11 @@ async function loadRecord() {
                <table>
                  <thead>
                    <tr>
-                     <th>Test Name &amp; Confidence</th>
-                     <th>Value</th>
+                     <th>Test Name &amp; Extraction</th>
+                     <th class="col-numeric">Value</th>
                      <th>Unit</th>
                      <th>Reference Range</th>
-                     <th>Status</th>
+                     <th style="min-width: 160px;">Clinical Status</th>
                      <th style="text-align: right;">Clinician Review</th>
                    </tr>
                  </thead>
@@ -325,12 +385,12 @@ async function loadRecord() {
              </div>`;
 
         return `
-          <div class="card" style="margin-bottom: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-wrap:wrap; gap:8px;">
-              <h3 style="margin:0;">
+          <div class="doc-panel" style="margin-bottom: 24px;">
+            <div class="doc-section-header">
+              <h3 class="doc-section-title">
                 Report ${idx + 1} — ${escapeHtml(report.filename)}
               </h3>
-              <span class="text-muted" style="font-size:0.8rem;">
+              <span class="doc-meta-note">
                 Uploaded ${reportDate}
               </span>
             </div>
@@ -342,20 +402,20 @@ async function loadRecord() {
 
     // Filter controls UI (rendered above reports if reports exist)
     const filterControlsHtml = hasReports ? `
-      <div class="card filter-bar-card" style="margin-bottom: 16px; padding: 14px 18px;">
+      <div class="filter-bar-card" style="margin-bottom: 18px;">
         <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 220px; position: relative;">
             <input
               type="text"
               id="test-filter-search"
-              placeholder="🔍 Filter tests by name (e.g. glucose, bun)…"
-              style="width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; font-size: 0.88rem;"
+              placeholder="Filter tests by name (e.g. glucose, bun)…"
+              style="width: 100%; border: 1px solid var(--hairline-dark); border-radius: var(--radius-sm); padding: 7px 12px; font-size: 0.88rem;"
             >
           </div>
 
           <div style="display: flex; align-items: center; gap: 6px;">
-            <label for="test-filter-status" style="font-size: 0.82rem; color: var(--text-muted);">Status:</label>
-            <select id="test-filter-status" style="border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 0.85rem;">
+            <label for="test-filter-status" style="font-size: 0.82rem; color: var(--ink-secondary); margin: 0;">Status:</label>
+            <select id="test-filter-status" style="border: 1px solid var(--hairline-dark); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.85rem; width: auto;">
               <option value="all">All Statuses</option>
               <option value="Low">Low</option>
               <option value="Normal">Normal</option>
@@ -364,9 +424,9 @@ async function loadRecord() {
             </select>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fee2e2; padding: 6px 12px; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--hairline); border-radius: var(--radius-sm); background: var(--bg-paper);">
             <input type="checkbox" id="test-filter-review" style="cursor: pointer;">
-            <label for="test-filter-review" style="font-size: 0.82rem; font-weight: 600; color: #b91c1c; cursor: pointer;">
+            <label for="test-filter-review" style="font-size: 0.82rem; font-weight: 500; color: var(--ink-primary); cursor: pointer; margin: 0;">
               Show only items needing review
             </label>
           </div>
@@ -378,17 +438,17 @@ async function loadRecord() {
 
     // ---- Assemble the Clinical Record Tab ----
     area.innerHTML = `
-      <div class="card" style="margin-bottom: 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="margin:0;">Patient Information</h3>
-          <span class="text-muted" style="font-size:0.8rem;">Click ✎ to edit any field</span>
+      <div class="doc-panel" style="margin-bottom: 24px;">
+        <div class="doc-section-header">
+          <h3 class="doc-section-title">Patient Demographics &amp; Clinical Profile</h3>
+          <span class="doc-meta-note">Baseline records</span>
         </div>
         ${infoHtml}
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin: 24px 0 12px 0;">
-        <h3 style="margin:0;">Lab Reports (${(patient.reports || []).length})</h3>
-        <a href="/upload.html?id=${patientId}" class="btn btn-sm btn-outline">+ Add Another Report</a>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin: 32px 0 16px 0; border-bottom: 1px solid var(--hairline); padding-bottom: 10px;">
+        <h2 style="margin:0; font-size: 1.45rem;">Diagnostic Lab Reports (${(patient.reports || []).length})</h2>
+        <a href="/upload.html?id=${patientId}" class="btn btn-sm btn-outline">Upload Lab Report</a>
       </div>
 
       ${filterControlsHtml}
@@ -396,13 +456,13 @@ async function loadRecord() {
         ${reportsHtml}
       </div>
 
-      <div class="flex-gap mt-24" style="border-top: 1px solid var(--border); padding-top: 20px;">
+      <div class="flex-gap mt-24" style="border-top: 1px solid var(--hairline); padding-top: 24px;">
         <button type="button" class="btn btn-outline" onclick="window.exportRecordAsPdf('${patientId}')">
-          📄 Export Record as PDF
+          Export Record (PDF)
         </button>
-        <a href="/upload.html?id=${patientId}" class="btn">Upload Another Report</a>
-        <a href="/summary.html?id=${patientId}" class="btn btn-purple">Generate Summary</a>
-        <a href="/dashboard.html" class="btn btn-outline">← Back to Patient Directory</a>
+        <a href="/upload.html?id=${patientId}" class="btn">Upload Lab Report</a>
+        <a href="/summary.html?id=${patientId}" class="btn btn-outline">Generate Summary</a>
+        <a href="/dashboard.html" class="btn btn-outline">Back to Patient Directory</a>
       </div>
     `;
 

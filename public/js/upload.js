@@ -45,20 +45,23 @@ async function loadPatient() {
       reportsDiv.innerHTML = '';
     } else {
       reportsDiv.innerHTML = `
-        <div class="card">
-          <h3>Previously Uploaded Reports (${patient.reports.length})</h3>
+      reportsDiv.innerHTML = `
+        <div class="doc-panel" style="margin-top: 24px;">
+          <div class="doc-section-header">
+            <h3 class="doc-section-title">Previously Uploaded Reports (${patient.reports.length})</h3>
+          </div>
           ${patient.reports.map((r, i) => `
             <div class="info-row">
               <span class="info-label">Report ${i + 1}</span>
               <span class="info-value">
-                ${r.filename}
-                &mdash; <strong>${r.results.length}</strong> result(s) extracted
+                <span style="font-weight: 500;">${r.filename}</span>
+                <span class="provenance-badge prov-ai" style="margin-left: 8px;">${r.results.length} results</span>
                 <span class="text-muted">(${new Date(r.uploaded_at).toLocaleString()})</span>
               </span>
             </div>
           `).join('')}
           <div class="mt-16">
-            <a href="/record.html?id=${patientId}" class="btn">View Full Record →</a>
+            <a href="/record.html?id=${patientId}" class="btn">View Clinical Record</a>
           </div>
         </div>
       `;
@@ -137,8 +140,8 @@ document.getElementById('upload-form').addEventListener('submit', async function
 
     alertArea.innerHTML = `
       <div class="alert alert-success">
-        ✓ Extracted <strong>${data.results_count}</strong> result(s).
-        <a href="/record.html?id=${patientId}">View Record →</a>
+        Extracted <strong>${data.results_count}</strong> test result(s).
+        <a href="/record.html?id=${patientId}">View Clinical Record</a>
       </div>
     `;
 

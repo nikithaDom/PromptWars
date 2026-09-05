@@ -52,35 +52,29 @@ function renderTimelineItem(evt, isLatest) {
     second: '2-digit',
   });
 
-  // Determine event type styling and icon
+  // Determine event type styling
   let typeLabel = 'Audit Event';
-  let icon = '📌';
   let typeClass = 'type-default';
 
   switch (evt.type) {
     case 'patient_created':
       typeLabel = 'Profile Created';
-      icon = '👤';
       typeClass = 'type-patient';
       break;
     case 'report_uploaded':
       typeLabel = 'Lab Report Uploaded';
-      icon = '🧪';
       typeClass = 'type-report';
       break;
     case 'field_edited':
-      typeLabel = 'Field Edited by User';
-      icon = '✏️';
+      typeLabel = 'Field Edited';
       typeClass = 'type-edit';
       break;
     case 'field_verified':
       typeLabel = 'Clinician Verified';
-      icon = '✓';
       typeClass = 'type-verify';
       break;
     case 'summary_generated':
       typeLabel = 'AI Summary Generated';
-      icon = '✨';
       typeClass = 'type-ai';
       break;
   }
@@ -88,11 +82,11 @@ function renderTimelineItem(evt, isLatest) {
   // Provenance badge
   let sourceBadge = '';
   if (evt.source === 'user_provided') {
-    sourceBadge = '<span class="badge badge-user">Clinician action</span>';
+    sourceBadge = '<span class="provenance-badge prov-user">Clinician action</span>';
   } else if (evt.source === 'ai_extracted') {
-    sourceBadge = '<span class="badge badge-ai">AI extracted</span>';
+    sourceBadge = '<span class="provenance-badge prov-ai">AI extracted</span>';
   } else if (evt.source === 'ai_generated') {
-    sourceBadge = '<span class="badge badge-ai" style="background:#f3e8ff; color:#7e22ce;">AI generated</span>';
+    sourceBadge = '<span class="provenance-badge prov-ai">AI generated</span>';
   }
 
   // Details rendering (diff chip for edits)
@@ -103,13 +97,13 @@ function renderTimelineItem(evt, isLatest) {
       <div class="diff-box">
         <span class="diff-field">${escapeHtml(fieldName || 'value')}:</span>
         <span class="diff-old"><del>${escapeHtml(oldValue !== null && oldValue !== undefined ? String(oldValue) : '(empty)')}</del></span>
-        <span class="diff-arrow">→</span>
+        <span style="font-size: 0.78rem; color: var(--ink-muted);">to</span>
         <span class="diff-new"><ins>${escapeHtml(newValue !== null && newValue !== undefined ? String(newValue) : '(empty)')}</ins></span>
       </div>
     `;
   } else if (evt.type === 'summary_generated' && evt.details?.summary_snippet) {
     detailsHtml = `
-      <div class="diff-box" style="font-style: italic; color: var(--text-muted);">
+      <div class="diff-box" style="font-style: italic; color: var(--ink-muted);">
         "${escapeHtml(evt.details.summary_snippet)}"
       </div>
     `;
@@ -117,20 +111,18 @@ function renderTimelineItem(evt, isLatest) {
 
   return `
     <div class="timeline-item ${isLatest ? 'timeline-latest' : ''}">
-      <div class="timeline-node">
-        <span class="timeline-icon">${icon}</span>
-      </div>
-      <div class="timeline-content card" style="margin-bottom: 14px; padding: 14px 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+      <div class="timeline-node"></div>
+      <div class="doc-panel" style="margin-bottom: 16px; padding: 16px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span class="timeline-type-badge ${typeClass}">${typeLabel}</span>
             ${sourceBadge}
           </div>
-          <span class="timeline-time text-muted" style="font-size: 0.78rem;">
+          <span class="timeline-time text-muted" style="font-size: 0.78rem; font-variant-numeric: tabular-nums;">
             ${formattedDate} at ${formattedTime}
           </span>
         </div>
-        <p style="margin: 8px 0 4px 0; font-size: 0.92rem; color: var(--text);">
+        <p style="margin: 8px 0 4px 0; font-size: 0.92rem; color: var(--ink-primary);">
           ${escapeHtml(evt.description)}
         </p>
         ${detailsHtml}

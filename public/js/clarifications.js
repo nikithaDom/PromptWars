@@ -38,26 +38,26 @@ async function renderClarifications(patientId, containerId = 'clarifications-are
         <div class="clarification-card" id="card-${c.id}">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
             <div>
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                <span class="badge badge-user" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">
-                  Needs your input
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+                <span class="provenance-badge prov-user">
+                  Input required
                 </span>
-                <strong>${escapeHtml(c.testName)}</strong>
+                <strong style="font-size: 1rem; color: var(--ink-primary);">${escapeHtml(c.testName)}</strong>
               </div>
-              <p style="margin: 0 0 10px 0; font-size: 0.92rem; color: #1e293b;">
+              <p style="margin: 0 0 10px 0; font-size: 0.92rem; color: var(--ink-secondary);">
                 ${escapeHtml(c.question)}
               </p>
             </div>
           </div>
 
-          ${optionsHtml ? `<div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;"><span style="font-size: 0.78rem; color: var(--text-muted);">Suggestions:</span>${optionsHtml}</div>` : ''}
+          ${optionsHtml ? `<div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;"><span style="font-size: 0.78rem; color: var(--ink-muted);">Suggestions:</span>${optionsHtml}</div>` : ''}
 
           <div style="display: flex; gap: 8px; align-items: center; max-width: 440px;">
             <input
               type="text"
               id="input-clar-${c.id}"
               placeholder="Enter confirmed ${escapeAttr(c.field)}…"
-              style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 0.88rem;"
+              style="flex: 1; border: 1px solid var(--hairline-dark); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.88rem;"
             >
             <button
               type="button"
@@ -73,13 +73,13 @@ async function renderClarifications(patientId, containerId = 'clarifications-are
     }).join('');
 
     container.innerHTML = `
-      <div class="card" style="border-left: 4px solid #3b82f6; background: #f0f9ff; margin-bottom: 20px; padding: 18px 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <h3 style="margin: 0; color: #0369a1; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
-            <span>💬</span> Context-Aware Clarifications Needed (${pending.length})
+      <div class="doc-panel" style="border-left: 3px solid var(--teal-accent); background: var(--teal-faint); margin-bottom: 24px; padding: 18px 22px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h3 style="margin: 0; color: var(--teal-hover); font-size: 1.15rem; display: flex; align-items: baseline; gap: 8px;">
+            Context-Aware Clarifications Required (${pending.length})
           </h3>
-          <span class="text-muted" style="font-size: 0.8rem;">
-            Answers are saved with provenance [User clarified]
+          <span class="doc-meta-note">
+            Submissions are preserved with [User Clarified] provenance
           </span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px;">
