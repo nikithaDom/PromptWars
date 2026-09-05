@@ -36,7 +36,10 @@ app.use('/api/patients', require('./routes/comparison'));     // GET /api/patien
 app.use('/api/patients', require('./routes/conflicts'));      // GET conflicts, POST scan, POST acknowledge
 app.use('/api/patients', require('./routes/clarifications')); // GET clarifications, POST resolve
 app.use('/api/patients', require('./routes/export'));         // GET /api/patients/:id/export (PDF / Print)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`MedLens running → http://localhost:${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`MedLens running → http://localhost:${PORT}`);
-});
+module.exports = app;

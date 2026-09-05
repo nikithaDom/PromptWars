@@ -1,0 +1,733 @@
+{
+  "patients": [
+    {
+      "id": "1788598448398",
+      "created_at": "2026-09-05T08:54:08.398Z",
+      "updated_at": "2026-09-05T09:12:38.653Z",
+      "fields": {
+        "name": {
+          "value": "Eleanor Vance",
+          "source": "user_provided"
+        },
+        "mrn": {
+          "value": "MRN-10293",
+          "source": "user_provided"
+        },
+        "age": {
+          "value": 48,
+          "source": "user_provided"
+        },
+        "sex": {
+          "value": "Female",
+          "source": "user_provided"
+        },
+        "symptoms": {
+          "value": "Fatigue improving, headaches resolved",
+          "source": "user_provided"
+        },
+        "existing_conditions": {
+          "value": "Type 2 Diabetes",
+          "source": "user_provided"
+        },
+        "allergies": {
+          "value": "Penicillin",
+          "source": "user_provided"
+        },
+        "current_medications": {
+          "value": "",
+          "source": "user_provided"
+        },
+        "notes": {
+          "value": "",
+          "source": "user_provided"
+        }
+      },
+      "reports": [
+        {
+          "id": "rep-test-01",
+          "uploaded_at": "2026-09-05T09:12:38.639Z",
+          "filename": "blood_chemistry.pdf",
+          "results": [
+            {
+              "id": "rep-test-01-res-1",
+              "test_name": {
+                "value": "Fasting Glucose",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": "140",
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "mg/dL",
+                "source": "user_clarified"
+              },
+              "reference_range_low": {
+                "value": "70",
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": "99",
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "70 - 99 mg/dL",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.65,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            }
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "id": "evt-1788599558653-5gc26",
+          "timestamp": "2026-09-05T09:12:38.653Z",
+          "type": "field_edited",
+          "description": "User clarified Fasting Glucose (unit): was \"\" → \"mg/dL\"",
+          "source": "user_provided",
+          "details": {
+            "clarificationId": "clar-1788599558640-wezn",
+            "reportId": "rep-test-01",
+            "testId": "rep-test-01-res-1",
+            "testName": "Fasting Glucose",
+            "field": "unit",
+            "oldValue": "",
+            "newValue": "mg/dL"
+          }
+        },
+        {
+          "id": "evt-1788598448415-6nk5v",
+          "timestamp": "2026-09-05T08:54:08.416Z",
+          "type": "field_edited",
+          "description": "Edited symptoms: was \"Fatigue, headaches for 2 weeks\" → now \"Fatigue improving, headaches resolved\"",
+          "source": "user_provided",
+          "details": {
+            "targetType": "patient_field",
+            "fieldName": "symptoms",
+            "oldValue": "Fatigue, headaches for 2 weeks",
+            "newValue": "Fatigue improving, headaches resolved"
+          }
+        },
+        {
+          "id": "evt-1788598448398-95yhl",
+          "timestamp": "2026-09-05T08:54:08.398Z",
+          "type": "patient_created",
+          "description": "Patient profile created (Eleanor Vance, MRN-10293, 48y, Female)",
+          "source": "user_provided",
+          "details": {
+            "name": "Eleanor Vance",
+            "mrn": "MRN-10293",
+            "age": 48,
+            "sex": "Female"
+          }
+        }
+      ],
+      "clarifications": [
+        {
+          "id": "clar-1788599558640-lrwx",
+          "reportId": "rep-test-01",
+          "testId": "rep-test-01-res-1",
+          "testName": "Fasting Glucose",
+          "field": "value",
+          "question": "Low extraction certainty (65%) for Fasting Glucose (detected \"140\"). Is this value accurate, or should it be corrected?",
+          "currentValue": "140",
+          "suggestedOptions": [],
+          "status": "pending",
+          "createdAt": "2026-09-05T09:12:38.640Z",
+          "resolvedAt": null,
+          "answer": null
+        },
+        {
+          "id": "clar-1788599558640-wezn",
+          "reportId": "rep-test-01",
+          "testId": "rep-test-01-res-1",
+          "testName": "Fasting Glucose",
+          "field": "unit",
+          "question": "The report shows \"140\" for Fasting Glucose but the unit is unclear or missing. What is the unit of measurement?",
+          "currentValue": "—",
+          "suggestedOptions": [
+            "mg/dL",
+            "mmol/L"
+          ],
+          "status": "resolved",
+          "createdAt": "2026-09-05T09:12:38.640Z",
+          "resolvedAt": "2026-09-05T09:12:38.653Z",
+          "answer": "mg/dL"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "1788609376803",
+      "created_at": "2026-09-05T11:56:16.803Z",
+      "updated_at": "2026-09-05T11:56:16.803Z",
+      "fields": {
+        "name": {
+          "value": "Praveena",
+          "source": "user_provided"
+        },
+        "mrn": {
+          "value": "MRN-675146",
+          "source": "user_provided"
+        },
+        "age": {
+          "value": "45",
+          "source": "user_provided"
+        },
+        "sex": {
+          "value": "Female",
+          "source": "user_provided"
+        },
+        "symptoms": {
+          "value": "leg pains, back pains",
+          "source": "user_provided"
+        },
+        "existing_conditions": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "allergies": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "current_medications": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "notes": {
+          "value": "",
+          "source": "user_provided"
+        }
+      },
+      "reports": [],
+      "timeline": [
+        {
+          "id": "evt-1788609376803-oppoj",
+          "timestamp": "2026-09-05T11:56:16.803Z",
+          "type": "patient_created",
+          "description": "Patient profile created (Praveena, MRN-675146, 45y, Female)",
+          "source": "user_provided",
+          "details": {
+            "name": "Praveena",
+            "mrn": "MRN-675146",
+            "age": "45",
+            "sex": "Female"
+          }
+        }
+      ],
+      "clarifications": []
+    },
+    {
+      "id": "1788610690008",
+      "created_at": "2026-09-05T12:18:10.008Z",
+      "updated_at": "2026-09-05T12:24:29.543Z",
+      "fields": {
+        "name": {
+          "value": "hivex.dt",
+          "source": "user_provided"
+        },
+        "mrn": {
+          "value": "MRN-109883",
+          "source": "user_provided"
+        },
+        "age": {
+          "value": "45",
+          "source": "user_provided"
+        },
+        "sex": {
+          "value": "Female",
+          "source": "user_provided"
+        },
+        "symptoms": {
+          "value": "frequent headaches, leg and back pains",
+          "source": "user_provided"
+        },
+        "existing_conditions": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "allergies": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "current_medications": {
+          "value": "none",
+          "source": "user_provided"
+        },
+        "notes": {
+          "value": "",
+          "source": "user_provided"
+        }
+      },
+      "reports": [
+        {
+          "id": "rep-1788611069543",
+          "uploaded_at": "2026-09-05T12:24:29.543Z",
+          "filename": "cbc-report-format.pdf",
+          "results": [
+            {
+              "id": "rep-1788611069543-res-1",
+              "test_name": {
+                "value": "HEMOGLOBIN",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 15,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "g/dl",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 13,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 17,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "13 - 17",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-2",
+              "test_name": {
+                "value": "TOTAL LEUKOCYTE COUNT",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 5100,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "cumm",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 4800,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 10800,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "4,800 - 10,800",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-3",
+              "test_name": {
+                "value": "NEUTROPHILS",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 79,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 40,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 80,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "40 - 80",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-4",
+              "test_name": {
+                "value": "LYMPHOCYTE",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 18,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 20,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 40,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "20 - 40",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-5",
+              "test_name": {
+                "value": "EOSINOPHILS",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 1,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 1,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 6,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "1 - 6",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-6",
+              "test_name": {
+                "value": "MONOCYTES",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 1,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 2,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 10,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "2 - 10",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-7",
+              "test_name": {
+                "value": "BASOPHILS",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 1,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": null,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 2,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "< 2",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-8",
+              "test_name": {
+                "value": "PLATELET COUNT",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 3.5,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "lakhs/cumm",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 1.5,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 4.1,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "1.5 - 4.1",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-9",
+              "test_name": {
+                "value": "TOTAL RBC COUNT",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 5,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "million/cumm",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 4.5,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 5.5,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "4.5 - 5.5",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-10",
+              "test_name": {
+                "value": "HEMATOCRIT VALUE, HCT",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 42,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 40,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 50,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "40 - 50",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-11",
+              "test_name": {
+                "value": "MEAN CORPUSCULAR VOLUME, MCV",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 84,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "fL",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 83,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 101,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "83 - 101",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-12",
+              "test_name": {
+                "value": "MEAN CELL HAEMOGLOBIN, MCH",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 30,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "Pg",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 27,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 32,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "27 - 32",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            },
+            {
+              "id": "rep-1788611069543-res-13",
+              "test_name": {
+                "value": "MEAN CELL HAEMOGLOBIN CON, MCHC",
+                "source": "ai_extracted"
+              },
+              "value": {
+                "value": 35.7,
+                "source": "ai_extracted"
+              },
+              "unit": {
+                "value": "%",
+                "source": "ai_extracted"
+              },
+              "reference_range_low": {
+                "value": 31.5,
+                "source": "ai_extracted"
+              },
+              "reference_range_high": {
+                "value": 34.5,
+                "source": "ai_extracted"
+              },
+              "reference_range_raw_text": {
+                "value": "31.5 - 34.5",
+                "source": "ai_extracted"
+              },
+              "confidence": {
+                "value": 0.99,
+                "source": "ai_extracted"
+              },
+              "verified": false
+            }
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "id": "evt-1788611069543-1j4r2",
+          "timestamp": "2026-09-05T12:24:29.543Z",
+          "type": "report_uploaded",
+          "description": "Lab report 'cbc-report-format.pdf' uploaded with 13 test result(s) extracted",
+          "source": "ai_extracted",
+          "details": {
+            "report_id": "rep-1788611069543",
+            "filename": "cbc-report-format.pdf",
+            "count": 13
+          }
+        },
+        {
+          "id": "evt-1788610690008-zjv72",
+          "timestamp": "2026-09-05T12:18:10.008Z",
+          "type": "patient_created",
+          "description": "Patient profile created (hivex.dt, MRN-109883, 45y, Female)",
+          "source": "user_provided",
+          "details": {
+            "name": "hivex.dt",
+            "mrn": "MRN-109883",
+            "age": "45",
+            "sex": "Female"
+          }
+        }
+      ],
+      "clarifications": [],
+      "conflicts": [
+        {
+          "id": "conflict-1",
+          "created_at": "2026-09-05T12:24:38.675Z",
+          "type": "profile_conflict",
+          "title": "Unreported Condition / Lab Inconsistency",
+          "reason": "Possible inconsistency — needs human review: The report notes elevated MCHC (35.7%) as well as slightly decreased lymphocyte (18%) and monocyte (1%) percentages, whereas profile indicates no existing conditions.",
+          "status": "pending",
+          "severity": "info"
+        }
+      ]
+    }
+  ]
+}

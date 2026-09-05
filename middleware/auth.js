@@ -8,15 +8,16 @@ const crypto = require('crypto');
 // In-memory token store for active sessions: token -> { user, expiresAt }
 const activeSessions = new Map();
 
-// Helper to generate a random session token
-function generateToken() {
-  return crypto.randomBytes(32).toString('hex');
-}
+const AUTH_SECRET = process.env.SESSION_SECRET || 'medlens-demo-session-secret';
 
 function createSession(user) {
-  const token = generateToken();
   // Valid for 24 hours
   const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+  const payload = JSON.stringify({ user, expiresAt });
+  const b64Payload = Buffer.from(payload).toString('base64url');
+  const hmac = crypto.createHmac('sha256', AUTH_SECRET).update(b64Payload).digest('hex');
+  const token = `${b64Payload}.${hmac}`;
+
   activeSessions.set(token, { user, expiresAt });
   return token;
 }
@@ -28,12 +29,30 @@ function invalidateSession(token) {
 function getSessionUser(token) {
   if (!token) return null;
   const session = activeSessions.get(token);
-  if (!session) return null;
-  if (Date.now() > session.expiresAt) {
-    activeSessions.delete(token);
-    return null;
+  if (session) {
+    if (Date.now() > session.expiresAt) {
+      activeSessions.delete(token);
+      return null;
+    }
+    return session.user;
   }
-  return session.user;
+
+  // Stateless fallback across distributed serverless function invocations
+  try {
+    const parts = token.split('.');
+    if (parts.length === 2) {
+      const [b64Payload, signature] = parts;
+      const expected = crypto.createHmac('sha256', AUTH_SECRET).update(b64Payload).digest('hex');
+      if (signature.length === expected.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+        const decoded = JSON.parse(Buffer.from(b64Payload, 'base64url').toString('utf8'));
+        if (decoded && decoded.expiresAt && Date.now() <= decoded.expiresAt) {
+          return decoded.user;
+        }
+      }
+    }
+  } catch (_) {}
+
+  return null;
 }
 
 // Express middleware

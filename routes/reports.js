@@ -22,8 +22,8 @@ const { requireAuth } = require('../middleware/auth');
 
 router.use(requireAuth);
 
-// Save uploads to /uploads temporarily; original filename preserved in file.originalname
-const upload = multer({ dest: path.join(__dirname, '../uploads/') });
+// Use memory storage so uploads work in read-only serverless environments
+const upload = multer({ storage: multer.memoryStorage() });
 
 function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -64,13 +64,13 @@ router.post('/:id/reports', upload.single('report'), async (req, res) => {
   const patient = db.patients.find(p => p.id === id);
 
   if (!patient) {
-    fs.unlinkSync(file.path); // clean up orphaned upload
+    if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
     return res.status(404).json({ error: 'Patient not found' });
   }
 
   try {
-    // Read the file and base64-encode it for the Gemini API
-    const fileBuffer = fs.readFileSync(file.path);
+    // Read the file buffer directly (from memory or disk fallback) and base64-encode it for Gemini
+    const fileBuffer = file.buffer || (file.path ? fs.readFileSync(file.path) : Buffer.from(''));
     const base64Data = fileBuffer.toString('base64');
     const mimeType   = file.mimetype || 'application/pdf';
 
@@ -185,8 +185,10 @@ router.post('/:id/reports', upload.single('report'), async (req, res) => {
     console.error('Report extraction error:', err.message);
     res.status(500).json({ error: err.message });
   } finally {
-    // Always delete the temp file — even on error
-    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    // Clean up temporary file if saved to disk
+    if (file && file.path && fs.existsSync(file.path)) {
+      try { fs.unlinkSync(file.path); } catch (_) {}
+    }
   }
 });
 

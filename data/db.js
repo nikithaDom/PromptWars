@@ -4,19 +4,36 @@
  */
 const fs   = require('fs');
 const path = require('path');
+const os   = require('os');
 
-const DB_PATH = path.join(__dirname, 'db.json');
+const SEED_PATH = path.join(__dirname, 'db.json');
+// On Vercel / serverless, root directory is read-only, so use writable /tmp
+const DB_PATH = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'medlens_db.json')
+  : SEED_PATH;
 
 function initDB() {
   if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ patients: [] }, null, 2));
+    let initialContent = JSON.stringify({ patients: [] }, null, 2);
+    if (fs.existsSync(SEED_PATH)) {
+      try {
+        initialContent = fs.readFileSync(SEED_PATH, 'utf8');
+      } catch (_) {}
+    }
+    try {
+      fs.writeFileSync(DB_PATH, initialContent, 'utf8');
+    } catch (err) {
+      console.warn('Warning: Unable to write initial db.json to disk:', err.message);
+    }
   }
 }
 
 function readDB() {
   initDB();
   try {
-    const content = fs.readFileSync(DB_PATH, 'utf8');
+    const target = fs.existsSync(DB_PATH) ? DB_PATH : (fs.existsSync(SEED_PATH) ? SEED_PATH : null);
+    if (!target) return { patients: [] };
+    const content = fs.readFileSync(target, 'utf8');
     const data = JSON.parse(content);
     if (!Array.isArray(data.patients)) data.patients = [];
     return data;
@@ -27,10 +44,14 @@ function readDB() {
 }
 
 function writeDB(data) {
-  // Atomic write via temp file
-  const tempPath = `${DB_PATH}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  fs.renameSync(tempPath, DB_PATH);
+  try {
+    // Atomic write via temp file
+    const tempPath = `${DB_PATH}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+    fs.renameSync(tempPath, DB_PATH);
+  } catch (err) {
+    console.error('Error writing to db.json:', err.message);
+  }
 }
 
 /**
