@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedLens — Clinical Login</title>
+  <meta name="description" content="Secure clinical access to patient medical records.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .login-wrapper {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      max-width: 440px;
+      width: 100%;
+      padding: 36px;
+    }
+    .demo-box {
+      background: #eff6ff;
+      border: 1px dashed #93c5fd;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #1e40af;
+    }
+    .demo-box code {
+      background: #dbeafe;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-brand" href="/">⚕ MedLens</a>
+    <span style="font-size:0.875rem; color:var(--text-muted);">Clinical Portal</span>
+  </nav>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 2.2rem; margin-bottom: 6px;">🩺</div>
+        <h1 style="font-size: 1.5rem; margin-bottom: 4px;">Clinician Login</h1>
+        <p class="text-muted" style="font-size: 0.9rem;">
+          Sign in to access patient records and lab analyses
+        </p>
+      </div>
+
+      <div class="demo-box">
+        <strong>Demo Access Enabled:</strong><br>
+        Email: <code>clinician@medlens.local</code><br>
+        Password: <code>demo123</code>
+        <div style="margin-top: 8px;">
+          <button type="button" id="btn-fill-demo" class="btn btn-sm" style="background:#2563eb; color:#fff; padding:4px 10px; font-size:0.75rem;">
+            Auto-Fill Demo Credentials
+          </button>
+        </div>
+      </div>
+
+      <div id="alert-area"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Clinician Email</label>
+          <input type="text" id="email" name="email" required placeholder="clinician@medlens.local" value="clinician@medlens.local">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required placeholder="••••••••" value="demo123">
+        </div>
+
+        <button type="submit" class="btn" id="login-btn" style="width: 100%; margin-top: 12px;">
+          Sign In to MedLens
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.getElementById('btn-fill-demo').addEventListener('click', () => {
+      document.getElementById('email').value = 'clinician@medlens.local';
+      document.getElementById('password').value = 'demo123';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const alertArea = document.getElementById('alert-area');
+      const btn = document.getElementById('login-btn');
+
+      alertArea.innerHTML = '';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        alertArea.innerHTML = `<div class="alert alert-error" style="margin-bottom:16px;">${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Sign In to MedLens';
+      }
+    });
+  </script>
+</body>
+</html>

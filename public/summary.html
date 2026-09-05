@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedLens — Patient Summary</title>
+  <meta name="description" content="AI-generated plain-language summary of a patient's record.">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-brand" href="/dashboard.html">⚕ MedLens</a>
+    <a href="/dashboard.html">Patients</a>
+    <a href="/index.html">+ New Intake</a>
+    <span id="nav-links"></span>
+  </nav>
+
+  <main>
+    <h1>Patient Summary</h1>
+    <p class="page-sub">
+      Generate a plain-language summary of this patient's record.
+      The summary is <span class="badge badge-ai">AI-generated</span> — not a medical diagnosis.
+    </p>
+
+    <div id="alert-area"></div>
+
+    <div class="card">
+      <!-- Disclaimer shown before the user even clicks -->
+      <div class="alert alert-info mb-16">
+        ⚠️ The summary below is produced by an AI and is provided for informational
+        purposes only. It is <strong>not a medical diagnosis</strong>. Always consult
+        a qualified healthcare professional.
+      </div>
+
+      <button class="btn btn-purple" id="generate-btn">
+        Generate Summary
+      </button>
+    </div>
+
+    <!-- Hidden until a summary is returned -->
+    <div id="summary-area" style="display:none;">
+      <div class="card">
+        <div class="flex-gap mb-16">
+          <h3 style="margin:0;">Summary</h3>
+          <span class="badge badge-ai">AI-generated</span>
+        </div>
+        <div class="summary-box" id="summary-text"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/summary.js"></script>
+</body>
+</html>

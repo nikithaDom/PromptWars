@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedLens — Patient Record</title>
+  <meta name="description" content="Structured patient record with source badges, audit history, and longitudinal comparisons.">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-brand" href="/dashboard.html">⚕ MedLens</a>
+    <a href="/dashboard.html">Patients</a>
+    <a href="/index.html">+ New Intake</a>
+    <!-- record.js populates contextual patient links here -->
+    <span id="nav-links"></span>
+  </nav>
+
+  <main style="max-width: 1060px;">
+    <!-- Top Patient Header & Tabs are rendered by record.js -->
+    <div id="patient-header-area"></div>
+
+    <!-- Alert / notifications -->
+    <div id="alert-area"></div>
+
+    <!-- Possible Inconsistencies & Conflicts Banner -->
+    <div id="conflicts-banner-area"></div>
+
+    <!-- Context-Aware Clarification Prompts -->
+    <div id="clarifications-area"></div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-bar" id="record-tabs" style="display: none;">
+      <button type="button" class="tab-btn active" data-tab="tab-record">
+        📋 Clinical Record
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-comparison">
+        📈 Trends &amp; Comparison
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-timeline">
+        ⏱️ Audit History
+      </button>
+    </div>
+
+    <!-- Tab 1: Structured Clinical Record -->
+    <div id="tab-record" class="tab-content active">
+      <div id="record-area">
+        <p class="text-muted" style="padding: 24px 0;">Loading record…</p>
+      </div>
+    </div>
+
+    <!-- Tab 2: Report-over-Time Comparison -->
+    <div id="tab-comparison" class="tab-content" style="display: none;">
+      <div id="comparison-container">
+        <p class="text-muted" style="padding: 24px 0;">Loading longitudinal comparisons…</p>
+      </div>
+    </div>
+
+    <!-- Tab 3: Timeline & Audit Trail -->
+    <div id="tab-timeline" class="tab-content" style="display: none;">
+      <div id="timeline-container">
+        <p class="text-muted" style="padding: 24px 0;">Loading audit history…</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/timeline.js"></script>
+  <script src="/js/comparison.js"></script>
+  <script src="/js/conflicts.js"></script>
+  <script src="/js/clarifications.js"></script>
+  <script src="/js/export.js"></script>
+  <script src="/js/record.js"></script>
+</body>
+</html>
