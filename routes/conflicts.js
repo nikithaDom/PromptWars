@@ -16,6 +16,7 @@ const router  = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { readDB, writeDB, logEvent } = require('../data/db');
 const { requireAuth } = require('../middleware/auth');
+const { checkCrossReportDivergence } = require('../lib/clinical');
 
 router.use(requireAuth);
 
@@ -23,73 +24,6 @@ function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) return null;
   return new GoogleGenerativeAI(apiKey);
-}
-
-// Algorithmic check: cross-report implausible jumps
-function checkCrossReportDivergence(patient) {
-  const detected = [];
-  const reports = (patient.reports || []).slice().sort(
-    (a, b) => new Date(a.uploaded_at) - new Date(b.uploaded_at)
-  );
-
-  if (reports.length < 2) return detected;
-
-  // Track values by test
-  const testMap = new Map();
-  reports.forEach(report => {
-    (report.results || []).forEach(r => {
-      const name = (r.test_name?.value || '').trim().toLowerCase();
-      const num = parseFloat(r.value?.value);
-      if (!name || isNaN(num)) return;
-
-      if (!testMap.has(name)) testMap.set(name, []);
-      testMap.get(name).push({
-        reportId: report.id,
-        filename: report.filename,
-        date: new Date(report.uploaded_at),
-        value: num,
-        unit: r.unit?.value || '',
-        testName: r.test_name?.value,
-      });
-    });
-  });
-
-  testMap.forEach((readings, name) => {
-    if (readings.length < 2) return;
-
-    for (let i = 1; i < readings.length; i++) {
-      const prev = readings[i - 1];
-      const curr = readings[i];
-      const daysDiff = Math.abs((curr.date - prev.date) / (1000 * 60 * 60 * 24));
-
-      // Check if values diverged drastically in a short window
-      if (prev.value > 0) {
-        const foldChange = curr.value / prev.value;
-        const percentChange = Math.abs((curr.value - prev.value) / prev.value) * 100;
-
-        // Severe divergence: > 200% shift or > 3x change within 14 days
-        if ((percentChange >= 200 || foldChange >= 3 || foldChange <= 0.33) && daysDiff <= 14) {
-          detected.push({
-            id: `conf-div-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-            created_at: new Date().toISOString(),
-            type: 'test_divergence',
-            title: `Substantial variation in ${curr.testName}`,
-            reason: `Possible inconsistency — needs human review: ${curr.testName} shifted from ${prev.value} ${prev.unit} (${prev.filename}) to ${curr.value} ${curr.unit} (${curr.filename}) across a ${Math.round(daysDiff)}-day interval. This may represent an acute change, different assay methodology, or transcription discrepancy.`,
-            status: 'pending',
-            severity: 'warning',
-            details: {
-              testName: curr.testName,
-              prevValue: prev.value,
-              currValue: curr.value,
-              unit: curr.unit,
-            },
-          });
-        }
-      }
-    }
-  });
-
-  return detected;
 }
 
 // LLM check: profile vs latest report

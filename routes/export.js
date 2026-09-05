@@ -13,16 +13,12 @@ const express = require('express');
 const router  = express.Router();
 const { readDB } = require('../data/db');
 const { requireAuth } = require('../middleware/auth');
+const { computeReferenceFlag } = require('../lib/clinical');
 
 router.use(requireAuth);
 
 function flagChip(value, low, high) {
-  if (low === null || low === undefined || high === null || high === undefined) return 'Range not provided';
-  const num = parseFloat(value);
-  if (isNaN(num)) return 'Range not provided';
-  if (num < parseFloat(low)) return 'LOW';
-  if (num > parseFloat(high)) return 'HIGH';
-  return 'NORMAL';
+  return computeReferenceFlag(value, low, high);
 }
 
 function provenanceLabel(source) {

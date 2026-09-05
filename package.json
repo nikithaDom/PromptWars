@@ -4,7 +4,8 @@
   "description": "Turn patient medical info and lab reports into structured records",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

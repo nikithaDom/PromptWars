@@ -8,6 +8,7 @@ const express = require('express');
 const router  = express.Router();
 const { readDB, writeDB, logEvent } = require('../data/db');
 const { requireAuth } = require('../middleware/auth');
+const { validatePatientIntake } = require('../lib/validation');
 
 // Protect patient endpoints with auth
 router.use(requireAuth);
@@ -66,20 +67,23 @@ router.get('/', (req, res) => {
 // POST /api/patients
 // Saves a new patient record. Every field is tagged source: "user_provided".
 router.post('/', (req, res) => {
+  const validation = validatePatientIntake(req.body);
+  if (!validation.isValid) {
+    return res.status(400).json({
+      error: validation.errors[0] || 'Invalid intake submission',
+      details: validation.errors,
+    });
+  }
+
   const {
     name, mrn, age, sex, symptoms,
     existing_conditions, allergies, current_medications, notes,
-  } = req.body;
-
-  // age and sex are the only required fields
-  if (!age || !sex) {
-    return res.status(400).json({ error: 'Age and sex are required' });
-  }
+  } = validation.sanitized;
 
   const db = readDB();
   const id = Date.now().toString();
-  const patientName = (name || '').trim() || `Patient #${id.slice(-4)}`;
-  const patientMrn  = (mrn || '').trim() || `MRN-${Math.floor(100000 + Math.random() * 900000)}`;
+  const patientName = name || `Patient #${id.slice(-4)}`;
+  const patientMrn  = mrn  || `MRN-${Math.floor(100000 + Math.random() * 900000)}`;
 
   const now = new Date().toISOString();
 

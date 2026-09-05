@@ -19,11 +19,19 @@ const fs                = require('fs');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { readDB, writeDB, logEvent } = require('../data/db');
 const { requireAuth } = require('../middleware/auth');
+const { computeReferenceFlag } = require('../lib/clinical');
+const { validateExtractionResults } = require('../lib/validation');
 
 router.use(requireAuth);
 
 // Use memory storage so uploads work in read-only serverless environments
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Mockable extraction hook for integration tests
+let customExtractor = null;
+function setExtractor(fn) {
+  customExtractor = fn;
+}
 
 function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -52,6 +60,36 @@ CRITICAL rules:
 - confidence is a float 0–1 reflecting your certainty in the extraction.
 - Return [] if no results are found.`;
 
+async function callAIExtractor(base64Data, mimeType) {
+  if (typeof customExtractor === 'function') {
+    return await customExtractor(base64Data, mimeType);
+  }
+
+  const genAI = getGenAI();
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+    systemInstruction: EXTRACTION_SYSTEM,
+    generationConfig: {
+      responseMimeType: 'application/json',
+    },
+  });
+
+  const filePart = {
+    inlineData: {
+      data: base64Data,
+      mimeType: mimeType,
+    },
+  };
+
+  const result = await model.generateContent([
+    filePart,
+    { text: EXTRACTION_USER },
+  ]);
+
+  const response = await result.response;
+  return response.text().trim();
+}
+
 router.post('/:id/reports', upload.single('report'), async (req, res) => {
   const { id } = req.params;
   const file   = req.file;
@@ -74,65 +112,54 @@ router.post('/:id/reports', upload.single('report'), async (req, res) => {
     const base64Data = fileBuffer.toString('base64');
     const mimeType   = file.mimetype || 'application/pdf';
 
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
-      systemInstruction: EXTRACTION_SYSTEM,
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
-    });
+    const rawText = await callAIExtractor(base64Data, mimeType);
 
-    const filePart = {
-      inlineData: {
-        data: base64Data,
-        mimeType: mimeType,
-      },
-    };
-
-    const result = await model.generateContent([
-      filePart,
-      { text: EXTRACTION_USER },
-    ]);
-
-    const response = await result.response;
-    const rawText = response.text().trim();
-    let results;
-    try {
-      results = JSON.parse(rawText);
-    } catch (_) {
-      // Fallback: try to find a JSON array inside the response if there's any surrounding text
-      const match = rawText.match(/\[[\s\S]*\]/);
-      if (match) {
-        results = JSON.parse(match[0]);
-      } else {
-        throw new Error('Gemini did not return valid JSON. Raw response: ' + rawText.slice(0, 200));
+    let parsedResults;
+    if (typeof rawText === 'object' && rawText !== null) {
+      parsedResults = rawText;
+    } else {
+      try {
+        parsedResults = JSON.parse(rawText);
+      } catch (_) {
+        // Fallback: try to find a JSON array inside the response if there's any surrounding text
+        const match = String(rawText).match(/\[[\s\S]*\]/);
+        if (match) {
+          parsedResults = JSON.parse(match[0]);
+        } else {
+          throw new Error('AI extractor did not return valid JSON. Raw response: ' + String(rawText).slice(0, 200));
+        }
       }
     }
 
-    if (!Array.isArray(results)) {
-      if (Array.isArray(results.results)) {
-        results = results.results;
-      } else if (Array.isArray(results.test_results)) {
-        results = results.test_results;
-      } else {
-        results = [];
-      }
+    // Validate the shape of the extracted JSON before storing
+    const validation = validateExtractionResults(parsedResults);
+    if (!validation.isValid && (!Array.isArray(parsedResults) || parsedResults.length > 0)) {
+      return res.status(422).json({
+        error: 'AI extraction returned malformed data schema',
+        details: validation.errors,
+      });
     }
 
-    // Tag every field with source: "ai_extracted"
+    const validatedResults = validation.results;
+
+    // Tag every field with source: "ai_extracted" and attach computed clinical flag
     const reportId = `rep-${Date.now()}`;
-    const taggedResults = results.map((r, idx) => ({
-      id:                       `${reportId}-res-${idx + 1}`,
-      test_name:                { value: r.test_name,                source: 'ai_extracted' },
-      value:                    { value: r.value,                    source: 'ai_extracted' },
-      unit:                     { value: r.unit,                     source: 'ai_extracted' },
-      reference_range_low:      { value: r.reference_range_low,      source: 'ai_extracted' },
-      reference_range_high:     { value: r.reference_range_high,     source: 'ai_extracted' },
-      reference_range_raw_text: { value: r.reference_range_raw_text, source: 'ai_extracted' },
-      confidence:               { value: typeof r.confidence === 'number' ? r.confidence : 0.85, source: 'ai_extracted' },
-      verified:                 false,
-    }));
+    const taggedResults = validatedResults.map((r, idx) => {
+      const flag = computeReferenceFlag(r.value, r.reference_range_low, r.reference_range_high);
+      return {
+        id:                       `${reportId}-res-${idx + 1}`,
+        test_name:                { value: r.test_name,                source: 'ai_extracted' },
+        value:                    { value: r.value,                    source: 'ai_extracted' },
+        unit:                     { value: r.unit,                     source: 'ai_extracted' },
+        reference_range_low:      { value: r.reference_range_low,      source: 'ai_extracted' },
+        reference_range_high:     { value: r.reference_range_high,     source: 'ai_extracted' },
+        reference_range_raw_text: { value: r.reference_range_raw_text, source: 'ai_extracted' },
+        confidence:               { value: typeof r.confidence === 'number' ? r.confidence : 0.85, source: 'ai_extracted' },
+        flag,
+        computed_flag:            flag,
+        verified:                 false,
+      };
+    });
 
     patient.reports.push({
       id:          reportId,
@@ -193,3 +220,4 @@ router.post('/:id/reports', upload.single('report'), async (req, res) => {
 });
 
 module.exports = router;
+module.exports.setExtractor = setExtractor;
